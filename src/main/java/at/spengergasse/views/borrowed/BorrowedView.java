@@ -1,5 +1,6 @@
 package at.spengergasse.views.borrowed;
 
+import at.spengergasse.views.home.HomeView;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
@@ -17,15 +18,7 @@ public class BorrowedView extends VerticalLayout {
 
     public BorrowedView() {
         setSpacing(false);
-
-        Image img = new Image("images/empty-plant.png", "placeholder plant");
-        img.setWidth("200px");
-        add(img);
-
-        H2 header = new H2("This place intentionally left empty");
-        header.addClassNames(Margin.Top.XLARGE, Margin.Bottom.MEDIUM);
-        add(header);
-        add(new Paragraph("It’s a place where you can grow your own UI 🤗"));
+        add(HomeView.getHeader());
 
         setSizeFull();
         setJustifyContentMode(JustifyContentMode.CENTER);
