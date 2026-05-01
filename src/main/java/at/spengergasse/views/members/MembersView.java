@@ -14,6 +14,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import org.apache.catalina.webresources.CachedResource;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @PageTitle("Members")
@@ -27,9 +28,9 @@ public class MembersView extends VerticalLayout {
 
         H2 title = new H2("Members:");
 
-        VerticalLayout member1 = createCard("Brian Hertenberger", 2505971);
-        VerticalLayout member2 = createCard("Lukas Schmidt", 3112011);
-        VerticalLayout member3 = createCard("Daniel Schumpeter", 1408021);
+        VerticalLayout member1 = createCard(1L,"Max Mustermann","max.mustermann@example.com",LocalDate.of(2024, 9, 12),3,5,0.0,true);
+        VerticalLayout member2 = createCard(2L,"Anna Müller","anna.mueller@example.com",LocalDate.of(2023, 3, 25),5,5,2.50,true);
+        VerticalLayout member3 = createCard(3L,"Lukas Bauer","lukas.bauer@example.com",LocalDate.of(2025, 1, 10),0,4,7.90,false);
 
         FlexLayout cardsLayout = new FlexLayout(member1,member2,member3);
         cardsLayout.setWidthFull();
@@ -43,11 +44,24 @@ public class MembersView extends VerticalLayout {
         getStyle().set("text-align", "center");
     }
 
-    private VerticalLayout createCard(String name, int id){
-        H2 membername = new H2(name);
-        Paragraph memberid = new Paragraph("Member-ID: " + id);
+    private VerticalLayout createCard(Long memberID,
+                                      String name,
+                                      String email,
+                                      LocalDate memberSince,
+                                      Integer borrowedBooks,
+                                      Integer maxBorrowLimit,
+                                      Double openFees,
+                                      Boolean membershipActive){
 
-        VerticalLayout card = new VerticalLayout(membername, memberid);
+        H2 memberId = new H2(String.valueOf("ID: " + memberID + " - " + name));
+        Paragraph memberEmail = new Paragraph("E-Mail: " + email);
+        Paragraph memberMemberSince = new Paragraph("Member since: " + memberSince);
+        Paragraph memberBorrowedBooks = new Paragraph("Borrowed Books: " + borrowedBooks);
+        Paragraph memberMaxBorrowLimit = new Paragraph("Booking Limit: " + maxBorrowLimit);
+        Paragraph memberOpenFees = new Paragraph("Open Fees: " + openFees);
+        Paragraph memberMembershipActive = new Paragraph(membershipActive?"Member is active":"Member is not active");
+
+        VerticalLayout card = new VerticalLayout(memberId, memberEmail, memberMemberSince, memberBorrowedBooks, memberMaxBorrowLimit, memberOpenFees, memberMembershipActive);
         card.setWidth("350px");
         card.setPadding(true);
         card.setSpacing(false);
