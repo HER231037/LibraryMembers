@@ -1,5 +1,6 @@
 package at.spengergasse.service;
 
+import at.spengergasse.domain.LibraryMemberException;
 import at.spengergasse.domain.Member;
 import com.github.javafaker.Faker;
 import jakarta.validation.constraints.NotBlank;
@@ -9,6 +10,7 @@ import org.springframework.web.socket.client.standard.AnnotatedEndpointConnectio
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -66,11 +68,45 @@ public class MemberService {
         members.add(m);
     }
 
+    public void remove1_oldschool(Long memberID) {
+        if(memberID == null) throw new LibraryMemberException("Fehler remove1: kein Account übergeben!");
+        boolean gefunden = false;
+        Member m;
+        Iterator<Member> iter = members.iterator();
+        while(iter.hasNext()){
+            m = iter.next();
+            if (m.getMemberID().equals(memberID)){
+                iter.remove();
+                gefunden = true;
+            }
+        }
+        if(!gefunden) throw new LibraryMemberException("Fehler remove1: Kein Account gefunden!");
+    }
+
+    public void remove1(Long memberID){
+        if(memberID == null) throw new LibraryMemberException("Fehler remove1: kein Account übergeben!");
+        boolean gefunden = members.removeIf(member -> member.getMemberID().equals(memberID));
+        if(!gefunden) throw new LibraryMemberException("Fehler remove1: Kein Account gefunden!");
+    }
+
+    public void newBorrow(Long memberID) {
+        if(memberID == null) throw new LibraryMemberException("Fehler newBorrow: kein Account übergeben!");
+       members.stream()
+               .filter(member -> member.getMemberID().equals(memberID))
+               .forEach(member -> member.setBorrowedBooks(member.getBorrowedBooks()+1));
+    }
+
+    public void returned(Long memberID) {
+        if(memberID == null) throw new LibraryMemberException("Fehler returned: kein Account übergeben!");
+        members.stream()
+                .filter(member -> member.getMemberID().equals(memberID))
+                .forEach(member -> member.setBorrowedBooks(member.getBorrowedBooks()-1));
+    }
+
     @Override
     public String toString(){
         return members.stream()
                 .map(s -> s.toString())
                 .collect(Collectors.joining("\n"));
     }
-
 }

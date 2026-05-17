@@ -29,7 +29,6 @@ public class MembersView extends VerticalLayout {
 
     private final com.vaadin.flow.component.button.Button removeAll = new Button("Remove all members");
     private final com.vaadin.flow.component.button.Button add10Members = new Button("Add 10 Members");
-    private final com.vaadin.flow.component.button.Button addWrongMember = new Button("Add Wrong m -> m.");
 
     private final Grid<Member> grid = new Grid<>(Member.class, false);
     private final MemberService memberService;
@@ -46,7 +45,6 @@ public class MembersView extends VerticalLayout {
                 .setHeader(new HorizontalLayout(i1, new Span("ID")))
                 .setAutoWidth(true)
                 .setSortable(true);
-
         grid.addColumn(m -> m.getName())
                 .setHeader("Name")
                 .setAutoWidth(true)
@@ -76,13 +74,24 @@ public class MembersView extends VerticalLayout {
                 .setAutoWidth(true)
                 .setSortable(true);
         grid.addComponentColumn(members -> {
-            com.vaadin.flow.component.checkbox.Checkbox cb = new Checkbox(members.getMembershipActive());
-            cb.setReadOnly(true);
-            return cb;
+                    com.vaadin.flow.component.checkbox.Checkbox cb = new Checkbox(members.getMembershipActive());
+                    cb.setReadOnly(true);
+                    return cb;
                 })
-                        .setHeader("Active")
-                        .setSortable(true)
-                        .setComparator(m -> m.getMembershipActive());
+                .setHeader("Active")
+                .setSortable(true)
+                .setComparator(m -> m.getMembershipActive());
+        grid.addComponentColumn(members -> new Button("Buch geborgt", e -> addBook(members.getMemberID())))
+                .setHeader("Borrowed new Book")
+                .setSortable(false);
+        grid.addComponentColumn(members -> new Button("Buch zurückgegeben", e -> returnBook(members.getMemberID())))
+                .setHeader("return Book")
+                .setSortable(false);
+        grid.addComponentColumn(members -> new Button("Delete Member", e -> remove1(members.getMemberID())))
+                .setHeader("Action")
+                .setSortable(false);
+
+
         grid.setSizeFull();
 
         removeAll.addClickListener(e -> removeAllMembers());
@@ -137,6 +146,33 @@ public class MembersView extends VerticalLayout {
         try {
             memberService.fillTestData(10);
             removeAll.setEnabled(true);
+            reload();
+        } catch (LibraryMemberException e) {
+            Notification.show(e.getMessage()); //Vaadin Klasse auswählen!
+        }
+    }
+
+    private void remove1(Long memberID) {
+        try {
+            memberService.remove1(memberID);
+            reload();
+        } catch (LibraryMemberException e) {
+            Notification.show(e.getMessage()); //Vaadin Klasse auswählen!
+        }
+    }
+
+    public void addBook(Long memberID) {
+        try {
+            memberService.newBorrow(memberID);
+            reload();
+        } catch (LibraryMemberException e) {
+            Notification.show(e.getMessage()); //Vaadin Klasse auswählen!
+        }
+    }
+
+    public void returnBook(Long memberID) {
+        try {
+            memberService.returned(memberID);
             reload();
         } catch (LibraryMemberException e) {
             Notification.show(e.getMessage()); //Vaadin Klasse auswählen!
