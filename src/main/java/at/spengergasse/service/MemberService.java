@@ -4,6 +4,7 @@ import at.spengergasse.domain.Member;
 import com.github.javafaker.Faker;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.client.standard.AnnotatedEndpointConnectionManager;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -57,10 +58,19 @@ public class MemberService {
         return copy;
     }
 
+    public void removeAllAccounts() {
+        members.clear();
+    }
+
+    public void addMember(Member m) {
+        members.add(m);
+    }
+
     @Override
     public String toString(){
         return members.stream()
                 .map(s -> s.toString())
                 .collect(Collectors.joining("\n"));
     }
+
 }

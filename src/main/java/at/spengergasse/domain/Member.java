@@ -2,10 +2,8 @@ package at.spengergasse.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDate;
@@ -13,7 +11,6 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Getter
-@Setter
 @ToString
 @EqualsAndHashCode(of = "memberID", callSuper = false)
 @Entity
@@ -24,9 +21,8 @@ public class Member implements Cloneable{
     private static final AtomicLong sequence = new AtomicLong(1000);
 
         //TODO: eventuell noch ein Dropdown-String hinzufügen/ergänzen.
-    @NotBlank
+
     private String name;
-    @NotBlank
     private String email;
     private LocalDate memberSince;
     private Integer borrowedBooks;
@@ -43,10 +39,10 @@ public class Member implements Cloneable{
         setName("Brian Hertenberger");
         setEmail("hertenberger@spengergasse.at");
         setMemberSince(LocalDate.now());
-        setBorrowedBooks(4);
         setMaxBorrowLimit(5);
+        setBorrowedBooks(4);
         setOpenFees(25.5);
-        setAccountTypes("Mitarbeiter");
+        setAccountType("Mitarbeiter");
         setMembershipActive(true);
     }
 
@@ -55,10 +51,10 @@ public class Member implements Cloneable{
         setName(name);
         setEmail(email);
         setMemberSince(memberSince);
-        setBorrowedBooks(borrowedBooks);
         setMaxBorrowLimit(maxBorrowLimit);
+        setBorrowedBooks(borrowedBooks);
         setOpenFees(openFees);
-        setAccountTypes(accountType);
+        setAccountType(accountType);
         setMembershipActive(membershipActive);
     }
 
@@ -75,18 +71,52 @@ public class Member implements Cloneable{
         setName(name);
         setEmail(email);
         setMemberSince(memberSince);
-        setBorrowedBooks(borrowedBooks);
         setMaxBorrowLimit(maxBorrowLimit);
+        setBorrowedBooks(borrowedBooks);
         setOpenFees(openFees);
-        setAccountTypes(accountType);
+        setAccountType(accountType);
         setMembershipActive(membershipActive);
     }
 
+    public void setName(String name) {
+        if(name.isBlank()) throw new LibraryMemberException("Name ungültig!");
+        this.name = name;
+    }
 
-    public void setAccountTypes(String accountType) {
+    public void setEmail(String email) {
+        if(email.isBlank()) throw new LibraryMemberException("E-Mail ungültig!");
+        this.email = email;
+    }
+
+    public void setMemberSince(LocalDate memberSince) {
+        this.memberSince = memberSince;
+    }
+
+    public void setBorrowedBooks(Integer borrowedBooks) {
+        if(borrowedBooks > maxBorrowLimit) throw new LibraryMemberException("Mitglied darf nicht mehr Bücher ausborgen als das Limit!");
+        if(borrowedBooks < 0) throw new LibraryMemberException("Ungueltiger Wert BorrowedBooks!");
+        this.borrowedBooks = borrowedBooks;
+    }
+
+    public void setMaxBorrowLimit(Integer maxBorrowLimit) {
+        if(maxBorrowLimit < 1) throw new LibraryMemberException("Ungueltiger Wert MaxBorrowedBooks!");
+        this.maxBorrowLimit = maxBorrowLimit;
+    }
+
+    public void setOpenFees(Double openFees) {
+        if(openFees < 0) throw new LibraryMemberException("Ungueltiger Wert openFees!");
+        this.openFees = openFees;
+    }
+
+    public void setAccountType(String accountType) {
         if(!Arrays.asList(accountTypes).contains(accountType)) throw new LibraryMemberException("Fehler setAccountTypes!");
         this.accountType = accountType;
     }
+
+    public void setMembershipActive(Boolean membershipActive) {
+        this.membershipActive = membershipActive;
+    }
+
 
     @Override
     public Member clone(){
