@@ -41,7 +41,7 @@ public class MemberService {
             name = faker.address().firstName();
             email = faker.internet().emailAddress();
             memberSince = LocalDate.now().minusDays((int) (Math.random() * 3650));
-            maxBorrowLimit = faker.number().numberBetween(0, 10);
+            maxBorrowLimit = faker.number().numberBetween(1, 10);
             borrowedBooks = faker.number().numberBetween(0,maxBorrowLimit);
             openFees = faker.number().randomDouble(2, 0, 100);
             accountType = accountTypes[faker.random().nextInt(0, accountTypes.length - 1)];

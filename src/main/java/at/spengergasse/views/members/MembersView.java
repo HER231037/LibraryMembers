@@ -4,9 +4,12 @@ import at.spengergasse.domain.LibraryMemberException;
 import at.spengergasse.domain.Member;
 import at.spengergasse.service.MemberService;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -19,16 +22,16 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 import java.awt.*;
 import java.time.LocalDate;
 
-@PageTitle("Member")
+@PageTitle("Members")
 @Route("members")
 @Menu(order = 1, icon = LineAwesomeIconUrl.AMILIA)
 public class MembersView extends VerticalLayout {
 
     private final com.vaadin.flow.component.button.Button removeAll = new Button("Remove all members");
     private final com.vaadin.flow.component.button.Button add10Members = new Button("Add 10 Members");
-    private final com.vaadin.flow.component.button.Button addWrongMember = new Button("Add Wrong Member");
+    private final com.vaadin.flow.component.button.Button addWrongMember = new Button("Add Wrong m -> m.");
 
-    private final Grid<Member> grid = new Grid<>(Member.class, true);
+    private final Grid<Member> grid = new Grid<>(Member.class, false);
     private final MemberService memberService;
 
 
@@ -37,13 +40,55 @@ public class MembersView extends VerticalLayout {
         setSpacing(true);
 
         setSizeFull();
+        Image i1 = new Image("images/id.jpg", "NameIMG");
+        i1.setHeight("32px");
+        grid.addColumn(m -> m.getMemberID())
+                .setHeader(new HorizontalLayout(i1, new Span("ID")))
+                .setAutoWidth(true)
+                .setSortable(true);
+
+        grid.addColumn(m -> m.getName())
+                .setHeader("Name")
+                .setAutoWidth(true)
+                .setSortable(true);
+        grid.addColumn(m -> m.getEmail())
+                .setHeader("E-Mail")
+                .setAutoWidth(true)
+                .setSortable(true);
+        grid.addColumn(m -> m.getAccountType())
+                .setHeader("Account Type")
+                .setAutoWidth(true)
+                .setSortable(true);
+        grid.addColumn(m -> m.getMemberSince())
+                .setHeader("m -> m. Since")
+                .setAutoWidth(true)
+                .setSortable(true);
+        grid.addColumn(m -> m.getBorrowedBooks())
+                .setHeader("Borrowed Books")
+                .setAutoWidth(true)
+                .setSortable(true);
+        grid.addColumn(m -> m.getMaxBorrowLimit())
+                .setHeader("Borrow Limit")
+                .setAutoWidth(true)
+                .setSortable(true);
+        grid.addColumn(m -> m.getOpenFees())
+                .setHeader("Open Fees")
+                .setAutoWidth(true)
+                .setSortable(true);
+        grid.addComponentColumn(members -> {
+            com.vaadin.flow.component.checkbox.Checkbox cb = new Checkbox(members.getMembershipActive());
+            cb.setReadOnly(true);
+            return cb;
+                })
+                        .setHeader("Active")
+                        .setSortable(true)
+                        .setComparator(m -> m.getMembershipActive());
         grid.setSizeFull();
 
         removeAll.addClickListener(e -> removeAllMembers());
         add10Members.addClickListener(e -> add10Members());
-        addWrongMember.addClickListener(e -> addWrongMember());
 
-        HorizontalLayout buttons = new HorizontalLayout(removeAll, add10Members, addWrongMember);
+        HorizontalLayout buttons = new HorizontalLayout(removeAll, add10Members);
         buttons.setSpacing(true);
         add(buttons);
 
@@ -59,11 +104,11 @@ public class MembersView extends VerticalLayout {
 
         H2 memberId = new H2(String.valueOf("ID: " + memberID + " - " + name));
         Paragraph memberEmail = new Paragraph("E-Mail: " + email);
-        Paragraph memberMemberSince = new Paragraph("Member since: " + memberSince);
+        Paragraph memberMemberSince = new Paragraph("m -> m. since: " + memberSince);
         Paragraph memberBorrowedBooks = new Paragraph("Borrowed Books: " + borrowedBooks);
         Paragraph memberMaxBorrowLimit = new Paragraph("Booking Limit: " + maxBorrowLimit);
         Paragraph memberOpenFees = new Paragraph("Open Fees: " + openFees);
-        Paragraph memberMembershipActive = new Paragraph(membershipActive ? "Member is active" : "Member is not active");
+        Paragraph memberMembershipActive = new Paragraph(membershipActive ? "m -> m. is active" : "m -> m. is not active");
 
         VerticalLayout card = new VerticalLayout(memberId, memberEmail, memberMemberSince, memberBorrowedBooks, memberMaxBorrowLimit, memberOpenFees, memberMembershipActive);
         card.setWidth("350px");
@@ -92,16 +137,6 @@ public class MembersView extends VerticalLayout {
         try {
             memberService.fillTestData(10);
             removeAll.setEnabled(true);
-            reload();
-        } catch (LibraryMemberException e) {
-            Notification.show(e.getMessage()); //Vaadin Klasse auswählen!
-        }
-    }
-
-    private void addWrongMember() {
-        try {
-            Member m = new Member("  ", "  ", LocalDate.now(), -1, -1, -1d, "False", false);
-            memberService.addMember(m);
             reload();
         } catch (LibraryMemberException e) {
             Notification.show(e.getMessage()); //Vaadin Klasse auswählen!
