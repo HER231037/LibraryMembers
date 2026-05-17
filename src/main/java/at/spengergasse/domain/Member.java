@@ -33,7 +33,6 @@ public class Member implements Cloneable{
     private Integer maxBorrowLimit;
     @NotNull(message = "Anzahl ausgeborgter Bücher darf nicht null/leer sein!")
     @Min(value = 0, message = "Wert unter 0 ist unzulässig!")
-    //if(borrowedBooks > maxBorrowLimit) throw new LibraryMemberException("Mitglied darf nicht mehr Bücher ausborgen als das Limit!");
     private Integer borrowedBooks;
     @NotNull(message = "Anzahl der offenen Gebühren muss mindestens 0 sein!")
     @DecimalMin(value = "0", message = "Anzahl der offenen Gebühren darf nicht weniger als 0 sein!")
@@ -54,14 +53,14 @@ public class Member implements Cloneable{
 
     public Member() {
         setMemberId();
-        setName("Brian Hertenberger");
-        setEmail("hertenberger@spengergasse.at");
+        setName("");
+        setEmail("");
         setMemberSince(LocalDate.now());
-        setMaxBorrowLimit(5);
-        setBorrowedBooks(4);
-        setOpenFees(25.5);
-        setAccountType("Mitarbeiter");
-        setMembershipActive(true);
+        setMaxBorrowLimit(1);
+        setBorrowedBooks(0);
+        setOpenFees(0d);
+        setAccountType("");
+        setMembershipActive(false);
     }
 
     public Member(Long memberID, String name, String email, LocalDate memberSince, Integer borrowedBooks, Integer maxBorrowLimit, Double openFees, String accountType, Boolean membershipActive)  {

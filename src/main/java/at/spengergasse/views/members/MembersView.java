@@ -3,8 +3,13 @@ package at.spengergasse.views.members;
 import at.spengergasse.domain.LibraryMemberException;
 import at.spengergasse.domain.Member;
 import at.spengergasse.service.MemberService;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.charts.model.Dial;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
@@ -13,9 +18,14 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.aspectj.weaver.ast.Test;
+import org.atmosphere.interceptor.AtmosphereResourceStateRecovery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
@@ -29,6 +39,7 @@ public class MembersView extends VerticalLayout {
 
     private final com.vaadin.flow.component.button.Button removeAll = new Button("Remove all members");
     private final com.vaadin.flow.component.button.Button add10Members = new Button("Add 10 Members");
+    private final Button addNewMember = new Button("Add new Member");
 
     private final Grid<Member> grid = new Grid<>(Member.class, false);
     private final MemberService memberService;
@@ -96,8 +107,9 @@ public class MembersView extends VerticalLayout {
 
         removeAll.addClickListener(e -> removeAllMembers());
         add10Members.addClickListener(e -> add10Members());
+        addNewMember.addClickListener(e -> addMember());
 
-        HorizontalLayout buttons = new HorizontalLayout(removeAll, add10Members);
+        HorizontalLayout buttons = new HorizontalLayout(removeAll, add10Members, addNewMember);
         buttons.setSpacing(true);
         add(buttons);
 
@@ -177,6 +189,55 @@ public class MembersView extends VerticalLayout {
         } catch (LibraryMemberException e) {
             Notification.show(e.getMessage()); //Vaadin Klasse auswählen!
         }
+    }
+
+    public void addMember() {
+        com.vaadin.flow.component.dialog.Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Neues Mitglied hinzufügen");
+
+        com.vaadin.flow.component.textfield.TextField name = new com.vaadin.flow.component.textfield.TextField("Name");
+        com.vaadin.flow.component.textfield.TextField  email = new com.vaadin.flow.component.textfield.TextField ("E-Mail Adresse");
+        DatePicker date = new DatePicker("Eintrittsdatum");
+        ComboBox<String> type = new ComboBox<>("Account-Typ");
+        type.setItems("Standard", "Student", "Premium", "Mitarbeiter");
+        IntegerField limit = new IntegerField("Limit");
+        IntegerField borrowed = new IntegerField("Anzahl aktuell ausgeborger Bücher");
+        NumberField fees = new NumberField("offene Gebühren");
+        Checkbox active = new Checkbox("Aktiv");
+
+        BeanValidationBinder<Member> binder = new BeanValidationBinder<>(Member.class);
+
+        binder.forField(name).bind("name");
+        binder.forField(email).bind("email");
+        binder.forField(date).bind("memberSince");
+        binder.forField(type).bind("accountType");
+        binder.forField(limit).bind("maxBorrowLimit");
+        binder.forField(borrowed).bind("borrowedBooks");
+        binder.forField(fees).bind("openFees");
+        binder.forField(active).bind("membershipActive");
+
+        Member member = new Member();
+        member.setMemberId();
+
+        binder.setBean(member);
+
+        VerticalLayout formLayout = new VerticalLayout(name, email, date, type, limit, borrowed, fees, active);
+
+        Button saveButton = new Button("Speichern", event -> {
+            if(binder.validate().isOk() && member.getBorrowedBooks() <= member.getMaxBorrowLimit()) {
+                memberService.addMember(member);
+                reload();
+                dialog.close();
+                Notification.show("Mitglied wurde angelegt!");
+            } else Notification.show("Fehler bei der Eingabe!");
+        });
+
+        Button cancelButton = new Button("Abbrechen", event -> dialog.close());
+
+        dialog.add(formLayout);
+        dialog.getFooter().add(saveButton, cancelButton);
+
+        dialog.open();
     }
 
 }
