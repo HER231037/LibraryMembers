@@ -11,13 +11,14 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
+import jakarta.validation.constraints.Email;
 import org.apache.catalina.webresources.CachedResource;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 import java.time.LocalDate;
 import java.util.Date;
 
-@PageTitle("Members")
+@PageTitle("Member")
 @Route("members")
 @Menu(order = 1, icon = LineAwesomeIconUrl.AMILIA)
 public class MembersView extends VerticalLayout {
@@ -26,7 +27,7 @@ public class MembersView extends VerticalLayout {
         setSpacing(false);
         add(HomeView.getHeader());
 
-        H2 title = new H2("Members:");
+        H2 title = new H2("Member:");
 
         VerticalLayout member1 = createCard(1L,"Max Mustermann","max.mustermann@example.com",LocalDate.of(2024, 9, 12),3,5,0.0,true);
         VerticalLayout member2 = createCard(2L,"Anna Müller","anna.mueller@example.com",LocalDate.of(2023, 3, 25),5,5,2.50,true);
