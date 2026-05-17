@@ -2,24 +2,20 @@ package at.spengergasse.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.SecondaryTable;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.atmosphere.config.service.Get;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(of = "memberID", callSuper = false)
 @Entity
 public class Member implements Cloneable{
 
@@ -66,6 +62,10 @@ public class Member implements Cloneable{
         setMembershipActive(membershipActive);
     }
 
+    public void setMemberId(){
+        memberID = sequence.getAndIncrement();
+    }
+
     private void setMemberId(Long memberID) {
         this.memberID = memberID;
     }
@@ -82,9 +82,6 @@ public class Member implements Cloneable{
         setMembershipActive(membershipActive);
     }
 
-    public void setMemberId(){
-        memberID = sequence.getAndIncrement();
-    }
 
     public void setAccountTypes(String accountType) {
         if(!Arrays.asList(accountTypes).contains(accountType)) throw new LibraryMemberException("Fehler setAccountTypes!");

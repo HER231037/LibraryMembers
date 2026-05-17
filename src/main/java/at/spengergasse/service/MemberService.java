@@ -19,7 +19,7 @@ public class MemberService {
 
     public MemberService(){
         members = new ArrayList<>(1000);
-        fillTestData(20);
+        fillTestData(100);
     }
 
     public void fillTestData(int count) {
@@ -49,6 +49,12 @@ public class MemberService {
             m = new Member(name, email, memberSince, borrowedBooks, maxBorrowLimit, openFees, accountType, membershipActive);
             members.add(m);
         }
+    }
+
+    public ArrayList<Member> findAll(){
+        ArrayList<Member> copy;
+        copy = new ArrayList<>(members);
+        return copy;
     }
 
     @Override

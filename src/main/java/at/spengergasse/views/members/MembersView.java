@@ -1,6 +1,9 @@
 package at.spengergasse.views.members;
 
+import at.spengergasse.domain.Member;
+import at.spengergasse.service.MemberService;
 import at.spengergasse.views.home.HomeView;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
@@ -13,6 +16,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import jakarta.validation.constraints.Email;
 import org.apache.catalina.webresources.CachedResource;
+import org.hibernate.event.spi.PreLoadEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 import java.time.LocalDate;
@@ -23,26 +28,21 @@ import java.util.Date;
 @Menu(order = 1, icon = LineAwesomeIconUrl.AMILIA)
 public class MembersView extends VerticalLayout {
 
-    public MembersView() {
-        setSpacing(false);
-        add(HomeView.getHeader());
+    private final Grid<Member> grid = new Grid<>(Member.class, true);
+    private final MemberService memberService;
 
-        H2 title = new H2("Member:");
-
-        VerticalLayout member1 = createCard(1L,"Max Mustermann","max.mustermann@example.com",LocalDate.of(2024, 9, 12),3,5,0.0,true);
-        VerticalLayout member2 = createCard(2L,"Anna Müller","anna.mueller@example.com",LocalDate.of(2023, 3, 25),5,5,2.50,true);
-        VerticalLayout member3 = createCard(3L,"Lukas Bauer","lukas.bauer@example.com",LocalDate.of(2025, 1, 10),0,4,7.90,false);
-
-        FlexLayout cardsLayout = new FlexLayout(member1,member2,member3);
-        cardsLayout.setWidthFull();
-        cardsLayout.setJustifyContentMode(JustifyContentMode.CENTER);
-        cardsLayout.setFlexWrap(FlexLayout.FlexWrap.WRAP);
-        add(cardsLayout);
+    public MembersView(@Autowired MemberService memberService) {
+        this.memberService = memberService;
+        setSpacing(true);
 
         setSizeFull();
-        setJustifyContentMode(JustifyContentMode.CENTER);
-        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
-        getStyle().set("text-align", "center");
+        grid.setSizeFull();
+        add(grid);
+        reload();
+    }
+
+    private void reload(){
+        grid.setItems(memberService.findAll());
     }
 
     private VerticalLayout createCard(Long memberID,
