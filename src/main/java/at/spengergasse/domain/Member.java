@@ -2,15 +2,14 @@ package at.spengergasse.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Getter
+@Setter
 @ToString
 @EqualsAndHashCode(of = "memberID", callSuper = false)
 @Entity
@@ -20,19 +19,38 @@ public class Member implements Cloneable{
     private Long memberID;
     private static final AtomicLong sequence = new AtomicLong(1000);
 
-        //TODO: eventuell noch ein Dropdown-String hinzufügen/ergänzen.
-
+    @NotBlank(message = "Name darf nicht leer sein!")
+    @Size(min = 3, max = 50, message = "Name muss zwischen 3 und 50 Zeichen lang sein!")
     private String name;
+    @Email(message = "Ungültige E-Mail Adresse!")
     private String email;
+    @NotNull(message = "Datum muss angegeben werden!")
+    @PastOrPresent(message = "Datum darf nicht in der Zukunft liegen!")
     private LocalDate memberSince;
-    private Integer borrowedBooks;
+    @NotNull(message = "Anzahl max. Anzahl ausgeborgter Bücher darf nicht null/leer sein!")
+    @Min(value = 1, message = "Wert unter 1 ist unzulässig!")
+    @Max(value = 10, message = "Member darf nicht mehr als 10 Bücher gleichzeitig ausborgen!")
     private Integer maxBorrowLimit;
+    @NotNull(message = "Anzahl ausgeborgter Bücher darf nicht null/leer sein!")
+    @Min(value = 0, message = "Wert unter 0 ist unzulässig!")
+    //if(borrowedBooks > maxBorrowLimit) throw new LibraryMemberException("Mitglied darf nicht mehr Bücher ausborgen als das Limit!");
+    private Integer borrowedBooks;
+    @NotNull(message = "Anzahl der offenen Gebühren muss mindestens 0 sein!")
+    @DecimalMin(value = "0", message = "Anzahl der offenen Gebühren darf nicht weniger als 0 sein!")
+    @DecimalMax(value = "500", message = "Member darf offene Gebühren von 500€ nicht überschreiten!")
     private Double openFees;
-
+    @NotBlank(message = "Accounttype darf nicht leer sein!")
+    @Pattern(regexp = "Standard|Student|Premium|Mitarbeiter", message = "Folgende Accounttypes sind zulässig: Standard, Student, Premium, Mitarbeiter")
     private String accountType;
-    private static final String[] accountTypes = { "Standard", "Student", "Premium", "Mitarbeiter" };
-
     private Boolean membershipActive;
+
+    @AssertTrue(message = "Anzahl ausgeborgter Bücher darf nicht größer als das maximale Ausleihlimit sein!")
+    public boolean isBorrowedBooksValid() {
+        if (borrowedBooks == null || maxBorrowLimit == null) {
+            return true;
+        }
+        return borrowedBooks <= maxBorrowLimit;
+    }
 
     public Member() {
         setMemberId();
@@ -77,46 +95,6 @@ public class Member implements Cloneable{
         setAccountType(accountType);
         setMembershipActive(membershipActive);
     }
-
-    public void setName(String name) {
-        if(name.isBlank()) throw new LibraryMemberException("Name ungültig!");
-        this.name = name;
-    }
-
-    public void setEmail(String email) {
-        if(email.isBlank()) throw new LibraryMemberException("E-Mail ungültig!");
-        this.email = email;
-    }
-
-    public void setMemberSince(LocalDate memberSince) {
-        this.memberSince = memberSince;
-    }
-
-    public void setBorrowedBooks(Integer borrowedBooks) {
-        if(borrowedBooks > maxBorrowLimit) throw new LibraryMemberException("Mitglied darf nicht mehr Bücher ausborgen als das Limit!");
-        if(borrowedBooks < 0) throw new LibraryMemberException("Ungueltiger Wert BorrowedBooks!");
-        this.borrowedBooks = borrowedBooks;
-    }
-
-    public void setMaxBorrowLimit(Integer maxBorrowLimit) {
-        if(maxBorrowLimit < 1) throw new LibraryMemberException("Ungueltiger Wert MaxBorrowedBooks!");
-        this.maxBorrowLimit = maxBorrowLimit;
-    }
-
-    public void setOpenFees(Double openFees) {
-        if(openFees < 0) throw new LibraryMemberException("Ungueltiger Wert openFees!");
-        this.openFees = openFees;
-    }
-
-    public void setAccountType(String accountType) {
-        if(!Arrays.asList(accountTypes).contains(accountType)) throw new LibraryMemberException("Fehler setAccountTypes!");
-        this.accountType = accountType;
-    }
-
-    public void setMembershipActive(Boolean membershipActive) {
-        this.membershipActive = membershipActive;
-    }
-
 
     @Override
     public Member clone(){
