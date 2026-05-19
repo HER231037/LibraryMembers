@@ -1,3 +1,7 @@
+/*
+    PROJEKT VON BRIAN HERTENBERGER 6ABIF 19.05.2026
+ */
+
 package at.spengergasse.views.borrowed;
 
 import at.spengergasse.views.home.HomeView;

@@ -1,3 +1,5 @@
+Projekt von BRIAN HERTENBERGER - 19.05.2026
+
 # Library Members
 
 This project can be used as a starting point to create your own Vaadin application with Spring Boot.
