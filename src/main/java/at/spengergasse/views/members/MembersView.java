@@ -105,13 +105,16 @@ public class MembersView extends VerticalLayout {
         grid.addComponentColumn(members -> new Button("Delete Member", e -> remove1(members.getMemberID())))
                 .setHeader("Action")
                 .setSortable(false);
-
+        grid.addComponentColumn(member -> new Button("Edit Member", e -> addEditMember(member)))
+                .setHeader("Task")
+                .setSortable(false);
 
         grid.setSizeFull();
 
         removeAll.addClickListener(e -> removeAllMembers());
         add10Members.addClickListener(e -> add10Members());
-        addNewMember.addClickListener(e -> addMember());
+        addNewMember.addClickListener(e -> addEditMember(null));
+
 
         HorizontalLayout buttons = new HorizontalLayout(removeAll, add10Members, addNewMember);
         buttons.setSpacing(true);
@@ -177,7 +180,7 @@ public class MembersView extends VerticalLayout {
         }
     }
 
-    public void addBook(Long memberID) {
+    private void addBook(Long memberID) {
         try {
             memberService.newBorrow(memberID);
             reload();
@@ -186,7 +189,7 @@ public class MembersView extends VerticalLayout {
         }
     }
 
-    public void returnBook(Long memberID) {
+    private void returnBook(Long memberID) {
         try {
             memberService.returned(memberID);
             reload();
@@ -195,9 +198,15 @@ public class MembersView extends VerticalLayout {
         }
     }
 
-    public void addMember() {
+    private void addEditMember(Member existingMember) {
+        Member member;
         com.vaadin.flow.component.dialog.Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Neues Mitglied hinzufügen");
+        dialog.setHeaderTitle(existingMember == null? "Neues Mitglied hinzufügen" : "Edit Member");
+        if(existingMember != null) member = existingMember;
+        else {
+            member = new Member();
+            member.setMemberId();
+        }
 
         com.vaadin.flow.component.textfield.TextField name = new com.vaadin.flow.component.textfield.TextField("Name");
         com.vaadin.flow.component.textfield.TextField  email = new com.vaadin.flow.component.textfield.TextField ("E-Mail Adresse");
@@ -219,9 +228,6 @@ public class MembersView extends VerticalLayout {
         binder.forField(borrowed).bind("borrowedBooks");
         binder.forField(fees).bind("openFees");
         binder.forField(active).bind("membershipActive");
-
-        Member member = new Member();
-        member.setMemberId();
 
         binder.setBean(member);
 
